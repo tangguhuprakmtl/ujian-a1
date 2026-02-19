@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UJIAN A.1</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif;}
+body{background:#ffffff; overflow-x:hidden; padding-bottom:180px;}
+header{height:90px; background:linear-gradient(90deg,#e4576e,#8e5bd9); display:flex; align-items:center; justify-content:space-between; padding:0 40px; color:white; position:sticky; top:0; z-index:9999; box-shadow:0 5px 20px rgba(0,0,0,0.2);}
+header img{width:80px;}
+header p{font-size:12px; letter-spacing:2px;}
+.hero{padding-top:140px; display:flex; flex-direction:column; align-items:center; min-height:calc(100vh - 90px);}
+.hero h1{font-size:40px; font-weight:800; color:#8e5bd9; margin-bottom:20px;}
+.back-btn{margin-bottom:30px; padding:12px 35px; background:linear-gradient(90deg,#e4576e,#8e5bd9); color:white; text-decoration:none; border-radius:30px; font-weight:600; font-size:14px; transition:0.3s; box-shadow:0 10px 25px rgba(0,0,0,0.15);}
+.back-btn:hover{transform:translateY(-5px); box-shadow:0 15px 30px rgba(0,0,0,0.2);}
+.main{display:flex; gap:40px; width:90%; max-width:1200px; margin-bottom:40px;}
+.left{flex:2;}
+.soal{margin-bottom:20px; font-size:18px; color:#333;}
+.options{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+.options button{padding:15px; border:none; border-radius:40px; background:#d6c1f2; color:#5b2e8d; cursor:pointer; transition:0.3s; font-weight:600;}
+.options button:hover{transform:translateY(-5px);}
+.options button.active{background:#5b2e8d; color:white;}
+.right{width:240px; display:flex; flex-direction:column; gap:20px;}
+.toggle-btn{padding:12px; border:none; border-radius:25px; background:linear-gradient(90deg,#e4576e,#8e5bd9); color:white; font-weight:600; cursor:pointer;}
+.number-grid{flex:1; display:grid; grid-template-columns:repeat(3,1fr); gap:12px; overflow-y:auto;}
+.number-grid.hidden{display:none;}
+.number-grid div{height:50px; background:linear-gradient(135deg,#ffb6f2,#cda1ff); border-radius:25px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:600; color:#5b2e8d;}
+.number-grid div.active{background:#5b2e8d; color:white;}
+.footer{display:flex; justify-content:space-between; gap:20px;}
+.footer button{flex:1; padding:15px; border:none; border-radius:40px; background:linear-gradient(135deg,#e4576e,#8e5bd9); font-size:16px; color:white; font-weight:600; cursor:pointer;}
+#skor{font-size:20px; font-weight:700; color:#e4576e; margin-top:20px; text-align:center;}
+#videoPembahasan{width:100%; max-width:900px; height:400px; border:none; border-radius:20px; margin-top:20px; display:none;}
+@media(max-width:1000px){.main{flex-direction:column;}.right{width:100%; flex-direction:row;}.number-grid{grid-template-columns:repeat(5,1fr); } #videoPembahasan{height:300px;} }
+</style>
+</head>
+<body>
+
+<header>
+<img src="img/logo.png" alt="Logo">
+<p>DESIGNED BY TECHONE</p>
+</header>
+
+<section class="hero">
+<h1>UJIAN A.1</h1>
+<a href="#" class="back-btn">← Kembali</a>
+
+<div class="main">
+<div class="left">
+<div class="soal" id="soalText"></div>
+
+<div class="options">
+<button onclick="selectOption(this,0)">A</button>
+<button onclick="selectOption(this,1)">B</button>
+<button onclick="selectOption(this,2)">C</button>
+<button onclick="selectOption(this,3)">D</button>
+</div>
+
+<div id="skor"></div>
+
+<iframe id="videoPembahasan" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div>
+
+<div class="right">
+<button class="toggle-btn" onclick="toggleNav()">Sembunyikan Nomor</button>
+<div class="number-grid" id="grid"></div>
+</div>
+</div>
+
+<div class="footer">
+<button onclick="prevSoal()">PREVIOUS</button>
+<button onclick="nextSoal()">NEXT</button>
+<button onclick="kumpulkanJawaban()">KUMPULKAN</button>
+</div>
+
+<script>
+const grid = document.getElementById("grid");
+const toggleButton = document.querySelector(".toggle-btn");
+const soalText = document.getElementById("soalText");
+const optionButtons = document.querySelectorAll(".options button");
+const videoPembahasan = document.getElementById("videoPembahasan");
+const skorDisplay = document.getElementById("skor");
+
+let totalSoal = 5;
+let currentSoal = 0;
+let jawaban = new Array(totalSoal).fill(null);
+
+const soalArray = [
+  {soal:"Soal 1: Pertanyaan A", benar:1, video:"https://www.youtube.com/embed/O0QNYPtr6gg?rel=0"},
+  {soal:"Soal 2: Pertanyaan B", benar:2, video:"https://www.youtube.com/embed/VIDEO_ID_LAIN?rel=0"},
+  {soal:"Soal 3: Pertanyaan C", benar:0, video:"https://www.youtube.com/embed/VIDEO_ID_LAIN2?rel=0"},
+  {soal:"Soal 4: Pertanyaan D", benar:3, video:"https://www.youtube.com/embed/VIDEO_ID_LAIN3?rel=0"},
+  {soal:"Soal 5: Pertanyaan E", benar:2, video:"https://www.youtube.com/embed/VIDEO_ID_LAIN4?rel=0"}
+];
+
+for(let i=0;i<totalSoal;i++){
+  let div = document.createElement("div");
+  div.innerText = i+1;
+  div.addEventListener("click",()=>goToSoal(i));
+  grid.appendChild(div);
+}
+
+function renderSoal(){
+  soalText.innerText = soalArray[currentSoal].soal;
+  optionButtons.forEach(btn=>btn.classList.remove("active"));
+  if(jawaban[currentSoal]!==null){
+    optionButtons[jawaban[currentSoal]].classList.add("active");
+  }
+  document.querySelectorAll(".number-grid div").forEach((div,index)=>{
+    div.classList.toggle("active", index===currentSoal);
+  });
+}
+
+function selectOption(btn,index){
+  optionButtons.forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  jawaban[currentSoal]=index;
+}
+
+function toggleNav(){
+  grid.classList.toggle("hidden");
+  toggleButton.innerText = grid.classList.contains("hidden") ? "Tampilkan Nomor" : "Sembunyikan Nomor";
+}
+
+function nextSoal(){ if(currentSoal<totalSoal-1) currentSoal++; renderSoal(); }
+function prevSoal(){ if(currentSoal>0) currentSoal--; renderSoal(); }
+function goToSoal(n){ currentSoal=n; renderSoal(); }
+
+function kumpulkanJawaban(){
+  if(jawaban.includes(null)){ alert("Masih ada soal yang belum dijawab!"); return; }
+  let skor=0;
+  jawaban.forEach((val,i)=>{ if(val===soalArray[i].benar) skor++; });
+  skorDisplay.innerText = `Skor kamu: ${skor}/${totalSoal}`;
+
+  videoPembahasan.style.display="block";
+  videoPembahasan.src = soalArray[currentSoal].video + "&autoplay=1&mute=1";
+}
+
+renderSoal();
+</script>
+
+</body>
+</html>
